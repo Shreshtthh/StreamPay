@@ -1,9 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import CreateStreamForm from '@/components/forms/CreateStreamForm';
+import NLPStreamInput from '@/components/NLPStreamInput';
 import { motion } from 'framer-motion';
 
+interface ParsedStreamData {
+  recipient: string;
+  amount: string;
+  duration: number;
+  durationUnit: 'seconds' | 'minutes' | 'hours' | 'days';
+  streamType?: string;
+  description?: string;
+}
+
 export default function CreatePage() {
+  const [parsedData, setParsedData] = useState<ParsedStreamData | null>(null);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -20,7 +33,9 @@ export default function CreatePage() {
         </p>
       </div>
       
-      <CreateStreamForm />
+      <NLPStreamInput onParsed={setParsedData} />
+      
+      <CreateStreamForm initialValues={parsedData} />
     </motion.div>
   );
 }
