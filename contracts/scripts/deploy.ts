@@ -250,7 +250,7 @@ async function generateFrontendConfig(deployment: DeploymentData, networkName: s
 // Network: ${networkName}
 
 export const CONTRACT_ADDRESSES = {
-  SOMNIA_STREAM: "${deployment.streamPay}",
+  STREAM_PAY: "${deployment.streamPay}",
   STREAM_KEEPER: "${deployment.streamKeeper}",
   STREAM_FACTORY: "${deployment.streamFactory}",
 } as const;
@@ -323,7 +323,7 @@ export const DEMO_STREAMS = {
 console.log("📋 StreamPay contracts loaded:");
 console.log("- Network:", DEPLOYMENT_INFO.NETWORK);
 console.log("- Currency:", DEPLOYMENT_INFO.CURRENCY);
-console.log("- StreamPay:", CONTRACT_ADDRESSES.SOMNIA_STREAM);
+console.log("- StreamPay:", CONTRACT_ADDRESSES.STREAM_PAY);
 console.log("- StreamKeeper:", CONTRACT_ADDRESSES.STREAM_KEEPER);
 console.log("- StreamFactory:", CONTRACT_ADDRESSES.STREAM_FACTORY);
 `;
