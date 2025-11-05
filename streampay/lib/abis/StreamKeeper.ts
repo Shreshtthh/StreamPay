@@ -3,7 +3,7 @@ export const STREAM_KEEPER_ABI = [
       "inputs": [
         {
           "internalType": "address",
-          "name": "_StreamPay",
+          "name": "_streamPay",
           "type": "address"
         },
         {
@@ -516,7 +516,7 @@ export const STREAM_KEEPER_ABI = [
     },
     {
       "inputs": [],
-      "name": "StreamPay",
+      "name": "streamPay",
       "outputs": [
         {
           "internalType": "contract IStreamPay",

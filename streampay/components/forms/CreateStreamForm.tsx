@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useCreateStream } from '@/hooks/useStreamContract';
 import { RATE_HELPERS, STREAM_TYPES, StreamType } from '@/lib/contracts';
 import { formatWeiToEther, formatDuration } from '@/lib/utils';
-import { Calculator, Clock, DollarSign, User, FileText } from 'lucide-react';
+import { Calculator, Clock, DollarSign, User, FileText, AlertCircle, CheckCircle, ShieldAlert, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import { detectCreationFraud, FraudCheckResult } from '@/lib/stream-fraud-detector';
+import { useAccount } from 'wagmi';
 
-// 1. ADD THIS INTERFACE
 interface CreateStreamFormProps {
   initialValues?: {
     recipient: string;
@@ -24,7 +25,6 @@ interface CreateStreamFormProps {
   } | null;
 }
 
-// 2. UPDATE COMPONENT SIGNATURE TO ACCEPT PROPS
 export default function CreateStreamForm({ initialValues }: CreateStreamFormProps) {
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
@@ -32,18 +32,21 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
   const [streamType, setStreamType] = useState<StreamType>('work');
   const [description, setDescription] = useState('');
   const [usdRate, setUsdRate] = useState('');
-
+  
+  const [isCheckingFraud, setIsCheckingFraud] = useState(false);
+  const [fraudResult, setFraudResult] = useState<FraudCheckResult | null>(null);
+  const [showFraudModal, setShowFraudModal] = useState(false);
+  
   const { createStream, isPending } = useCreateStream();
+  const { address } = useAccount();
 
-  // 3. ADD THIS useEffect TO AUTO-POPULATE FORM WHEN AI PARSES DATA
   useEffect(() => {
     if (initialValues) {
-      // Convert duration to hours (your form uses hours)
       const durationInHours = 
         initialValues.durationUnit === 'days' ? initialValues.duration * 24 :
         initialValues.durationUnit === 'hours' ? initialValues.duration :
         initialValues.durationUnit === 'minutes' ? initialValues.duration / 60 :
-        initialValues.duration / 3600; // seconds to hours
+        initialValues.duration / 3600;
       
       setRecipient(initialValues.recipient);
       setAmount(initialValues.amount);
@@ -53,13 +56,11 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
     }
   }, [initialValues]);
 
-  // Calculate values (KEEP AS IS)
   const durationSeconds = duration ? parseInt(duration) * 3600 : 0;
   const amountWei = amount ? RATE_HELPERS.parseToWei(amount) : 0n;
   const flowRateWei = durationSeconds > 0 ? amountWei / BigInt(durationSeconds) : 0n;
   const flowRateUsd = flowRateWei > 0 ? RATE_HELPERS.weiSecondToUsdHour(flowRateWei) : 0;
 
-  // Calculate amount from USD rate (KEEP AS IS)
   const handleUsdRateChange = (value: string) => {
     setUsdRate(value);
     if (value && duration) {
@@ -71,13 +72,61 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCheckFraud = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!recipient || !amount || !duration || !description) {
+      toast.error('Please fill in all fields');
       return;
     }
+    
+    setIsCheckingFraud(true);
+    try {
+      const result = await detectCreationFraud({
+        recipient: recipient as `0x${string}`,
+        amount: amount,
+        duration: durationSeconds,
+        senderAddress: address || '',
+      });
+      
+      setFraudResult(result);
+      setShowFraudModal(true);
 
+      if (result.recommendation === 'block') {
+        toast.error(`🚨 Stream blocked: ${result.message}`);
+      } else if (result.recommendation === 'warn') {
+        toast.loading(`⚠️ ${result.message}`, { duration: 4000 });
+      }
+    } catch (error) {
+      console.error('Fraud check failed:', error);
+      toast.error('Fraud detection failed. Proceeding with caution.');
+      await handleSubmit();
+    } finally {
+      setIsCheckingFraud(false);
+    }
+  };
+
+  const handleFraudConfirm = async (proceed: boolean) => {
+    setShowFraudModal(false);
+    toast.dismiss();
+    
+    if (!proceed) {
+      toast.error('Stream creation cancelled');
+      return;
+    }
+    
+    if (fraudResult?.recommendation === 'block') {
+      toast.error('This stream cannot be created due to fraud detection');
+      return;
+    }
+    
+    await handleSubmit();
+  };
+
+  const handleSubmit = async () => {
+    if (!recipient || !amount || !duration || !description) {
+      return;
+    }
     try {
       await createStream(
         recipient as `0x${string}`,
@@ -87,15 +136,21 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
         amountWei
       );
       
-      // Reset form
       setRecipient('');
       setAmount('');
       setDuration('');
       setDescription('');
       setUsdRate('');
+      setFraudResult(null);
     } catch (error) {
       console.error('Failed to create stream:', error);
     }
+  };
+
+  const getFraudColor = (score: number) => {
+    if (score < 30) return 'text-green-500';
+    if (score < 60) return 'text-yellow-500';
+    return 'text-red-500';
   };
 
   return (
@@ -111,12 +166,12 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
             <span>Create New Stream</span>
           </CardTitle>
           <CardDescription>
-            Set up a real-time payment stream with per-second money flow
+            Set up a real-time payment stream with per-second money flow. AI-powered fraud detection enabled.
           </CardDescription>
         </CardHeader>
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleCheckFraud} className="space-y-6">
             {/* Stream Type Selection */}
             <div className="space-y-2">
               <Label>Stream Type</Label>
@@ -134,9 +189,6 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
                   </Button>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {STREAM_TYPES[streamType].description}
-              </p>
             </div>
 
             {/* Recipient Address */}
@@ -167,8 +219,8 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 required
-                min="0.1"
-                step="0.1"
+                min="0.01"
+                step="0.01"
               />
               {duration && (
                 <p className="text-xs text-muted-foreground">
@@ -266,14 +318,104 @@ export default function CreateStreamForm({ initialValues }: CreateStreamFormProp
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={isPending || !recipient || !amount || !duration || !description}
+              disabled={isPending || isCheckingFraud || !recipient || !amount || !duration || !description}
               className="w-full"
               variant="somnia"
               size="lg"
             >
-              {isPending ? 'Creating Stream...' : 'Create Stream'}
+              {isCheckingFraud ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Checking AI Fraud Detection...
+                </>
+              ) : (
+                'Review & Create Stream'
+              )}
             </Button>
           </form>
+
+          {/* ✅ FIXED: Fraud Modal with Null Safety */}
+          {showFraudModal && fraudResult && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <Card className="max-w-md w-full">
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    {fraudResult.recommendation === 'proceed' ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : fraudResult.recommendation === 'warn' ? (
+                      <AlertCircle className="h-5 w-5 text-yellow-500" />
+                    ) : (
+                      <ShieldAlert className="h-5 w-5 text-red-500" />
+                    )}
+                    <span>
+                      {fraudResult.recommendation === 'proceed' && 'Stream Safe'}
+                      {fraudResult.recommendation === 'warn' && 'Stream Warning'}
+                      {fraudResult.recommendation === 'block' && 'Stream Blocked'}
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold mb-2">Risk Score</p>
+                    <div className={`text-3xl font-bold ${getFraudColor(fraudResult.riskScore)}`}>
+                      {fraudResult.riskScore}/100
+                    </div>
+                  </div>
+
+                  {/* ✅ FIXED: Added null safety check */}
+                  {fraudResult?.riskFactors && fraudResult.riskFactors.length > 0 && (
+                    <div>
+                      <p className="text-sm font-semibold mb-2">Risk Factors</p>
+                      <ul className="text-sm space-y-1 list-disc list-inside">
+                        {fraudResult.riskFactors.map((factor, i) => (
+                          <li key={i} className="text-muted-foreground">{factor}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="bg-muted p-3 rounded text-sm">
+                    <p className="font-medium mb-1">🤖 AI Analysis:</p>
+                    <p className="text-muted-foreground">{fraudResult.message || 'No analysis available'}</p>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    {fraudResult.recommendation !== 'block' ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleFraudConfirm(false)}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => handleFraudConfirm(true)}
+                          className="flex-1"
+                          variant="somnia"
+                          disabled={isPending}
+                        >
+                          {isPending ? "Creating..." : "Proceed Anyway"}
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        onClick={() => setShowFraudModal(false)}
+                        className="w-full"
+                        variant="outline"
+                      >
+                        Close
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

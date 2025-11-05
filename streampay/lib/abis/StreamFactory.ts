@@ -3,7 +3,7 @@ export const STREAM_FACTORY_ABI = [
       "inputs": [
         {
           "internalType": "address",
-          "name": "_StreamPay",
+          "name": "_streamPay",
           "type": "address"
         },
         {
@@ -581,7 +581,7 @@ export const STREAM_FACTORY_ABI = [
     },
     {
       "inputs": [],
-      "name": "StreamPay",
+      "name": "streamPay",
       "outputs": [
         {
           "internalType": "contract IStreamPay",

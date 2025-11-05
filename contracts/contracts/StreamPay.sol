@@ -175,10 +175,10 @@ contract StreamPay is ReentrancyGuard, Ownable, Pausable {
      * @dev Batch update multiple streams - CORE INNOVATION
      * @param streamIds Array of stream IDs to update
      * @notice This is what makes real-time streaming possible on Somnia
+     * @notice CHANGE 1: Changed from onlyKeeper to public - allows AI agent to call directly
      */
     function batchUpdateStreams(uint256[] memory streamIds) 
-        external 
-        onlyKeeper 
+        public  // ← CHANGED: Was 'external onlyKeeper', now 'public'
         nonReentrant 
         whenNotPaused 
     {
@@ -208,6 +208,7 @@ contract StreamPay is ReentrancyGuard, Ownable, Pausable {
      * @dev Internal function to update a single stream's balance
      * @param streamId The stream to update
      * @return success Whether the update was successful
+     * @notice CHANGE 2: Added keeper reward logic here
      */
     function _updateStreamBalance(uint256 streamId) internal returns (bool success) {
         Stream storage stream = streams[streamId];
@@ -230,7 +231,22 @@ contract StreamPay is ReentrancyGuard, Ownable, Pausable {
         uint256 effectiveTimeElapsed = timeElapsed > maxTimeElapsed ? maxTimeElapsed : timeElapsed;
         uint256 newAmount = effectiveTimeElapsed * stream.flowRate;
         
-        stream.realTimeBalance += newAmount;
+        // ============ KEEPER REWARD LOGIC (NEW) ============
+        uint256 keeperReward = (newAmount * 1) / 1000; // 0.1% reward
+
+        if (keeperReward > 0 && newAmount > keeperReward) {
+            // Add remaining to recipient's balance
+            stream.realTimeBalance += (newAmount - keeperReward);
+            
+            // Pay keeper (msg.sender is the AI agent calling this)
+            (bool rewardSuccess, ) = payable(msg.sender).call{value: keeperReward}("");
+            require(rewardSuccess, "StreamPay: Keeper reward failed");
+        } else {
+            // If reward is 0 or larger than amount, just add full amount
+            stream.realTimeBalance += newAmount;
+        }
+        // ============ END REWARD LOGIC ============
+        
         stream.lastUpdateTime = block.timestamp;
         
         // Check if stream should be completed
