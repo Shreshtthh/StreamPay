@@ -57,7 +57,7 @@ Result: Pre-filled form ready for one-click submission
 
 ---
 
-### **Layer 2: AI as the Security Guardian** (DeFi Agent Innovation)
+### **Layer 2: AI as the Security Guardian** (DeFi Agent Innovation) (Works on Localhost right now)
 
 **The Problem:** Blockchain transactions are irreversible. A typo in an address or falling victim to a scam means permanent loss of funds.
 
@@ -82,7 +82,7 @@ Before any transaction is signed, our AI agent analyzes:
 
 ---
 
-### **Layer 3: AI as the Autonomous Economic Actor** (Infrastructure Innovation)
+### **Layer 3: AI as the Autonomous Economic Actor** (Infrastructure Innovation) (Works on Localhost right now)
 
 **The Problem:** Real-time payment streams require constant "keeper" updates to make funds withdrawable. Traditional cron-job bots are dumb—they run blindly regardless of economic conditions, wasting gas during high-fee periods.
 
@@ -117,6 +117,27 @@ This is where StreamPay becomes a true **autonomous AI agent** on Somnia:
 - File: `keeper/intelligent-keeper.ts` (main agent loop)
 - File: `keeper/batch-optimizer.ts` (AI decision logic)
 - Model: Google Gemini with economic analysis prompt
+
+
+### Architecture Note: Understanding the "Localhost" Keeper
+
+When you run this project, you'll notice it has two main parts that are run separately: the web app and the keeper. This is an intentional and scalable production architecture.
+
+1.  **The Serverless Web App (Vercel / `npm run dev`)**
+    * This is the Next.js application in the `streampay/app` directory.
+    * It includes our **on-demand AI API routes** (`/api/parse-stream` and `/api/check-fraud`).
+    * This part is **serverless**. It's perfect for platforms like Vercel, which can scale to handle thousands of users making short, on-demand requests (like loading a page or checking for fraud).
+
+2.  **The Autonomous Keeper Bot (Terminal / Cloud Server)**
+    * This is the `keeper/intelligent-keeper.ts` script.
+    * It is a **persistent, 24/7 background worker**. It runs in an endless loop (`setInterval`) to constantly monitor the blockchain and make economic decisions.
+    * Vercel's serverless functions are *not* designed for this; they have a short timeout (e.g., 10-60 seconds) and cannot run 24/7.
+
+**For the demo, we run these two components just as they would be in a massive production environment:**
+* The **Web App** runs on `localhost:3000` (or on Vercel).
+* The **Keeper Bot** runs in a separate terminal (simulating a 24/7 cloud server like an AWS EC2 instance or a Heroku worker).
+
+This isn't a limitation; it's the scalable architecture for an autonomous protocol. The web app scales for users, and the keeper scales for protocol work.
 
 ---
 
