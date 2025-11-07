@@ -336,10 +336,10 @@ yarn hardhat run scripts/deploy.ts --network somniaTestnet
 
 ## 🎥 Demo Materials
 
-- **Live dApp:** [YOUR_VERCEL_URL_HERE]
-- **GitHub Repository:** [YOUR_GITHUB_REPO_URL_HERE]
-- **Demo Video (5 min):** [YOUR_VIDEO_LINK_HERE]
-- **Pitch Deck:** [YOUR_PITCH_DECK_LINK_HERE]
+- **Live dApp:** https://streampay-olive.vercel.app/
+- **GitHub Repository:** https://github.com/Shreshtthh/streampay
+- **Demo Video (5 min):** https://youtu.be/g7mytqcaqf8
+- **Pitch Deck:** https://www.canva.com/design/DAG39dlvu4c/k5HrtErj6keUnXDzg4_mIg/edit?utm_content=DAG39dlvu4c&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
 
 ---
 
