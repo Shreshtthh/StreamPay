@@ -185,7 +185,7 @@ function _updateStreamBalance(streamId) {
 }
 ```
 
-**Contract Address:** `0xeff8b331a37cb2c03c04a087c53695a2b6dc0d45` ([View on Explorer](https://shannon.testnet.somnia.network/address/0xeff8b331a37cb2c03c04a087c53695a2b6dc0d45))
+**Contract Address:** `0xeff8b331a37cb2c03c04a087c53695a2b6dc0d45` ([View on Explorer](https://shannon-explorer.somnia.network/address/0xEFF8b331A37CB2c03c04a087C53695a2B6Dc0D45))
 
 #### **StreamFactory.sol** (UX Layer)
 Makes streams reusable via templates:
@@ -195,12 +195,12 @@ createTemplate(name, rate, duration, category) → Save common stream configs
 createStreamFromTemplate(templateId, recipient) → One-click stream creation
 ```
 
-**Contract Address:** `0xd91324c4c700bea8748ec11d8c510d8b32d2ca00` ([View on Explorer](https://shannon.testnet.somnia.network/address/0xd91324c4c700bea8748ec11d8c510d8b32d2ca00))
+**Contract Address:** `0xd91324c4c700bea8748ec11d8c510d8b32d2ca00` ([View on Explorer](https://shannon-explorer.somnia.network/address/0xd91324c4c700bea8748ec11d8c510d8b32d2ca00))
 
 #### **StreamKeeper.sol** (Fallback)
 Owner-controlled keeper as backup for protocol liveness:
 
-**Contract Address:** `0x251c6cff222eed46017731b4c87afd7af08f0c60` ([View on Explorer](https://shannon.testnet.somnia.network/address/0x251c6cff222eed46017731b4c87afd7af08f0c60))
+**Contract Address:** `0x251c6cff222eed46017731b4c87afd7af08f0c60` ([View on Explorer](https://shannon-explorer.somnia.network/address/0x251c6cff222eed46017731b4c87afd7af08f0c60))
 
 ---
 
@@ -312,7 +312,7 @@ SOMNIA_RPC_URL=https://dream-rpc.somnia.network
 EOF
 
 # Run the intelligent keeper agent
-yarn ts-node keeper/intelligent-keeper.ts
+npm run keeper
 ```
 
 Watch as the AI agent autonomously decides when to update streams based on real-time profitability!
@@ -329,7 +329,7 @@ SOMNIA_TESTNET_RPC_URL=https://dream-rpc.somnia.network
 EOF
 
 # Deploy to Somnia Testnet
-yarn hardhat run scripts/deploy.ts --network somniaTestnet
+npm hardhat run scripts/deploy.ts --network somniaTestnet
 ```
 
 ---
