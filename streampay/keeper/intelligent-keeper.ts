@@ -11,7 +11,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { somniaTestnet } from "../lib/contracts"; 
 import { STREAM_PAY_ABI } from "../lib/abis/StreamPay"; 
 import { optimizeBatching, Stream } from "./batch-optimizer";
-import { saveKeeperLog, initializeDatabase } from "../lib/db";
+// import { saveKeeperLog, initializeDatabase } from "../lib/db";
 
 // 1. LOAD ENV VARS
 const STREAM_PAY_ADDRESS = process.env.STREAM_PAY_ADDRESS as `0x${string}`;
@@ -46,7 +46,7 @@ console.log(`🎯 Watching contract: ${STREAM_PAY_ADDRESS}`);
  */
 async function runIntelligentKeeper() {
   // Initialize database schema on start
-  await initializeDatabase();
+  // await initializeDatabase();
 
   // Main loop
   setInterval(async () => {
@@ -88,12 +88,12 @@ async function runIntelligentKeeper() {
 
       if (!optimization.isProfitable) {
         console.log(`❌ Not profitable: ${optimization.decision}`);
-        await saveKeeperLog({
-          decision: "SKIP",
-          reason: optimization.decision,
-          gasPrice: gasPrice.toString(),
-          timestamp: new Date(),
-        });
+        // await saveKeeperLog({
+        //   decision: "SKIP",
+        //   reason: optimization.decision,
+        //   gasPrice: gasPrice.toString(),
+        //   timestamp: new Date(),
+        // });
         return;
       }
 
@@ -120,14 +120,14 @@ async function runIntelligentKeeper() {
           const receipt = await publicClient.waitForTransactionReceipt({ hash });
           console.log(`  ✅ Confirmed in block ${receipt.blockNumber}`);
 
-          await saveKeeperLog({
-            decision: "EXECUTE",
-            batchSize: batch.count,
-            streamIds: batch.streamIds.join(","),
-            expectedProfit: optimization.totalProfit / optimization.batches.length,
-            txHash: hash,
-            timestamp: new Date(),
-          });
+          // await saveKeeperLog({
+          //   decision: "EXECUTE",
+          //   batchSize: batch.count,
+          //   streamIds: batch.streamIds.join(","),
+          //   expectedProfit: optimization.totalProfit / optimization.batches.length,
+          //   txHash: hash,
+          //   timestamp: new Date(),
+          // });
         } catch (batchError: any) {
           console.error(`  ❌ Batch failed:`, batchError.message);
         }

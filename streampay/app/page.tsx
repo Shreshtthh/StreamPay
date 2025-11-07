@@ -296,14 +296,11 @@ export default function Dashboard() {
             <CardContent>
               {sentStreams && sentStreams.length > 0 ? (
                 <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
-                  {sentStreams.slice(0, 3).map((streamId) => (
+                  {/* --- FIX IS HERE --- */}
+                  {sentStreams.slice().reverse().map((streamId) => (
                     <StreamCard key={streamId} streamId={streamId} isReceived={false} />
                   ))}
-                  {sentStreams.length > 3 && (
-                    <Button variant="outline" className="w-full">
-                      View all {sentStreams.length} streams
-                    </Button>
-                  )}
+                  {/* --- END OF FIX --- */}
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
@@ -334,14 +331,11 @@ export default function Dashboard() {
             <CardContent>
               {receivedStreams && receivedStreams.length > 0 ? (
                 <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
-                  {receivedStreams.slice(0, 3).map((streamId) => (
+                  {/* --- FIX IS HERE --- */}
+                  {receivedStreams.slice().reverse().map((streamId) => (
                     <StreamCard key={streamId} streamId={streamId} isReceived={true} />
                   ))}
-                  {receivedStreams.length > 3 && (
-                    <Button variant="outline" className="w-full">
-                      View all {receivedStreams.length} streams
-                    </Button>
-                  )}
+                  {/* --- END OF FIX --- */}
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
