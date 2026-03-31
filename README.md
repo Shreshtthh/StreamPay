@@ -1,6 +1,6 @@
-# 🚀 StreamPay: Real-Time Payment Streaming with Autonomous AI Agents
+#  StreamPay: Real-Time Payment Streaming with Autonomous AI Agents
 
-## 🌟 Vision: The Future of Payments on Somnia
+##  Vision: The Future of Payments on Somnia
 
 StreamPay reimagines how value flows on-chain by creating a **truly autonomous payment streaming protocol** that leverages Somnia's unique capabilities—ultra-low latency, high throughput, and the ability to handle complex AI computations at blockchain speed.
 
@@ -10,7 +10,7 @@ We built StreamPay specifically for Somnia because **only Somnia can handle the 
 
 ---
 
-## 🎯 Why StreamPay Perfectly Aligns with Somnia's Ecosystem
+##  Why StreamPay Perfectly Aligns with Somnia's Ecosystem
 
 ### 1. **Leveraging Somnia's Speed for Real-Time Streaming**
 Traditional payment streams are limited by slow block times. StreamPay exploits Somnia's **sub-second finality** to enable:
@@ -32,7 +32,7 @@ Somnia isn't just fast—it's designed for AI agents as first-class citizens. St
 
 ---
 
-## 🏗️ The Three-Layer AI Architecture
+##  The Three-Layer AI Architecture
 
 ### **Layer 1: AI as the User Gateway** (Usability Innovation)
 
@@ -69,9 +69,9 @@ Before any transaction is signed, our AI agent analyzes:
 - **Temporal risk factors** (newly created addresses, suspicious timing)
 
 **Output:** Real-time risk assessment with actionable recommendations:
-- ✅ **Proceed** (Low Risk: 0-30%)
-- ⚠️ **Review** (Medium Risk: 31-70%)
-- 🛑 **Block** (High Risk: 71-100%)
+-  **Proceed** (Low Risk: 0-30%)
+-  **Review** (Medium Risk: 31-70%)
+-  **Block** (High Risk: 71-100%)
 
 **Somnia Advantage:** This pre-transaction AI check adds negligible latency thanks to Somnia's speed, making security feel frictionless rather than cumbersome.
 
@@ -141,7 +141,7 @@ This isn't a limitation; it's the scalable architecture for an autonomous protoc
 
 ---
 
-## 🎨 Why This Matters for Somnia's Ecosystem
+##  Why This Matters for Somnia's Ecosystem
 
 ### **1. Real-World Utility**
 StreamPay isn't a toy demo—it's production-ready infrastructure for:
@@ -266,7 +266,7 @@ streampay/
 
 ---
 
-## 🚀 Quick Start Guide
+##  Quick Start Guide
 
 ### **Prerequisites**
 - Node.js v18+
@@ -334,7 +334,7 @@ npm hardhat run scripts/deploy.ts --network somniaTestnet
 
 ---
 
-## 🎥 Demo Materials
+##  Demo Materials
 
 - **Live dApp:** https://streampay-olive.vercel.app/
 - **GitHub Repository:** https://github.com/Shreshtthh/streampay
@@ -367,7 +367,7 @@ npm hardhat run scripts/deploy.ts --network somniaTestnet
 
 ---
 
-## 🏆 Why StreamPay Wins on Somnia
+##  Why StreamPay Wins on Somnia
 
 StreamPay isn't just a hackathon project—it's a **blueprint for the future of autonomous protocols on Somnia**. We demonstrate that:
 
